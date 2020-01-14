@@ -53,7 +53,7 @@ const rentals = [{
   },
   'carId': '697a943f-89f5-4a81-914d-ecefaa7784ed',
   'pickupDate': '2020-01-05',
-  'returnDate': '2020-01-09',
+  'returnDate': '2020-01-09', 
   'distance': 300,
   'options': {
     'deductibleReduction': true
@@ -73,6 +73,7 @@ const rentals = [{
   'carId': '4afcc3a2-bbf4-44e8-b739-0179a6cd8b7d',
   'pickupDate': '2019-12-01',
   'returnDate': '2019-12-15',
+  'distance': 1000,
   'options': {
     'deductibleReduction': true
   },
@@ -156,7 +157,97 @@ const actors = [{
     'amount': 0
   }]
 }];
+price();
+function price()
+{
+var i="";
+for(i in rentals)
+  {
+    var distance="";
+    var time="";
 
-console.log(cars);
-console.log(rentals);
-console.log(actors);
+    var date1 = new Date(rentals[i].returnDate);
+    var date2 = new Date(rentals[i].pickupDate);
+    
+    time=dateDiff(date2,date1)
+    
+    console.log("Id: "+rentals[i].id);
+    var index=returnCar(rentals[i].carId);
+    var price = (time*(cars[index].pricePerDay))+((cars[index].pricePerKm )* rentals[i].distance);
+    var rentalprice = decrease(time,price);
+    rentals[i].commission = rentalprice*0.3;
+    rentals[i].insurance=rentals[i].commission/2;
+    rentals[i].treasury=1*time;
+    if(rentals[i].options.deductibleReduction == true)
+    {
+      var deductible_option = time * 4;
+      rentalprice += deductible_option;
+      rentals[i].virtuo=rentals[i].commission-(rentals[i].insurance+rentals[i].treasury)+deductible_option;
+    }
+    else {
+      rentals[i].virtuo=rentals[i].commission-(rentals[i].insurance+rentals[i].treasury);
+    }
+    console.log("Rental price: " + rentalprice+"\n");  
+    console.log("Commission :" + rentals[i].commission );
+    console.log("Insurance :" + rentals[i].insurance );
+    console.log("Treasury :" + rentals[i].treasury );
+    console.log("Virtuo :" + rentals[i].virtuo +"\n\n" );
+  }
+
+}
+
+function dateDiff(date1, date2)
+{
+  var diff = {}                           // Initialisation du retour
+  var tmp = date2 - date1;
+  
+
+  tmp = Math.floor(tmp/1000);             // Nombre de secondes entre les 2 dates
+  diff.sec = tmp % 60;                    // Extraction du nombre de secondes
+
+  tmp = Math.floor((tmp-diff.sec)/60);    // Nombre de minutes (partie entière)
+  diff.min = tmp % 60;                    // Extraction du nombre de minutes
+
+  tmp = Math.floor((tmp-diff.min)/60);    // Nombre d'heures (entières)
+  diff.hour = tmp % 24;                   // Extraction du nombre d'heures
+   
+  tmp = Math.floor((tmp-diff.hour)/24);   // Nombre de jours restants
+  diff.day = tmp;
+  
+  if (diff.sec==0 && diff.min==0 && diff.hour==0 && diff.day==0){diff.day=1;}
+  return diff.day;
+}
+
+function returnCar(id){
+  let number_car = cars.length;
+  for(let i = 0; i < number_car; i++)
+  {
+    if(id == cars[i].id)
+    {
+      return i;
+    }
+  }
+}
+ 
+
+function decrease(time,price)
+{
+  if(time>1 && time<=3)
+  {
+    price=price*(0.9);
+  }
+  if(time>3 && time<=10)
+  {
+    price=price*(0.7);
+  }
+  if(time>10)
+  {
+    price=price*(0.5);
+  }
+  return price;
+}
+
+
+//console.log(cars);
+//console.log(rentals);
+//console.log(actors);
